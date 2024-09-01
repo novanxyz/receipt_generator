@@ -20,8 +20,11 @@ if can have multiple company, and selected by company ID parameter.
 
 technical:
 work on 2 mode, gcs trigger, or http trigger ( please look on `.gitlab-ci.yaml` for deployment info)
-1. gcs mode: just put csv file on the gcs, the GCF will pull the file and generate the data.
+1. gcs mode: just put csv file on the gcs, the GCF will pull the file and generate the data. Used it to utilize gcs parallelism.
 2. http mode: trigger the `google cloud function`  url with post/put method, with csv file with payload.
+
+generation:
+look for `generation` folder to see the logic of _"GCS ramp up"_
 
 
 
