@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	RESULT_BUCKET   = Getenv("RESULT_BUCKET", "gojek_tax_receipts")
+	RESULT_BUCKET   = Getenv("RESULT_BUCKET", "<tax_receipt_repository>")
 	ASSET_FOLDER    = Getenv("ASSET_FOLDER", ".")
 	FIELD_DEMILITER = Getenv("FIELD_DEMILITER", ",")
 	RETRY_TIMEOUT   = 60
@@ -49,7 +49,7 @@ func init() {
 	bucket = client.Bucket(RESULT_BUCKET)
 	// log.Printf("GCS CONNECTED:%+v", bucket)
 
-	QUEUE_PATH = Getenv("QUEUE_PATH", "projects/gjk-fat-int-3r/locations/asia-southeast2/queues/failed-receipt-retrigger")
+	QUEUE_PATH = Getenv("QUEUE_PATH", "projects/<your-gcp-project>/locations/<your-gcp-region>/queues/failed-receipt-retrigger")
 	functions.HTTP("ReceiptRequest", ReceiptRequest)
 	// functions.CloudEvent("ReceiptEvent", ReceiptEvent)
 }
@@ -299,7 +299,7 @@ func QueueFailedUpload(receipt *Receipt) *taskspb.Task {
 					Url:        gcs_api_url,
 					AuthorizationHeader: &taskspb.HttpRequest_OauthToken{
 						OauthToken: &taskspb.OAuthToken{
-							ServiceAccountEmail: Getenv("SERVICE_ACCOUNT", "gjk-fat-int-3r@appspot.gserviceaccount.com"),
+							ServiceAccountEmail: Getenv("SERVICE_ACCOUNT", "<your-gcp-project>@appspot.gserviceaccount.com"),
 						},
 					},
 					Headers: map[string]string{"Content-Type": "application/pdf", "Content-Size": fmt.Sprint(len(pdfByte))},

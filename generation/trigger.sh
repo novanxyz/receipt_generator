@@ -9,12 +9,12 @@ wd=`realpath ${lwd}`
 td=`realpath ${lwd}/trigger/`
 rd=`realpath ${lwd}/triggered`
 
-PROJECT_ID=gjk-fat-int-3r
-QUEUE_NAME=gojek-receipt-trigger
-QUEUE_LOC=asia-southeast2
+PROJECT_ID=<your-gcp-project>
+QUEUE_NAME=receipt-trigger
+QUEUE_LOC=<your-gcp-region>
 QUEUE_ID=projects/$PROJECT_ID/locations/$QUEUE_LOC/queues/$QUEUE_NAME
-GCF_URL=https://asia-southeast2-gjk-fat-int-3r.cloudfunctions.net/tax_receipt
-SERVICE_ACCOUNT_EMAIL=gjk-fat-int-3r@appspot.gserviceaccount.com
+GCF_URL=https://<your-gcp-region>-<your-gcp-project>.cloudfunctions.net/tax_receipt
+SERVICE_ACCOUNT_EMAIL=<your-gcp-project>@appspot.gserviceaccount.com
 
 if [[ -z $TRIGGER_PROTOCOL ]]; then
   TRIGGER_PROTOCOL=http

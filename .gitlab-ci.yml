@@ -1,18 +1,18 @@
 variables:
-  GCP_ZONE: asia-southeast2-a
+  GCP_ZONE: <your-gcp-region>-a
   GCF_NAME: tax_receipt
-  GCF_REGION: asia-southeast2
+  GCF_REGION: <your-gcp-region>
   GCF_RUNTIME: go120
   GCF_TIMEOUT: '500'
   GCF_MEMORY: 2048MB
   GCF_CPU: 2
   FUNCTION_TARGET: ReceiptRequest
-  STAGING_BUCKET: staging.gjk-fat-int-3r.appspot.com
+  STAGING_BUCKET: staging.<your-gcp-project>.appspot.com
   TRIGGER_BUCKET: tax_receipt_trigger
   ASSET_FOLDER: $(pwd)
-  PROJECT_ID: gjk-fat-int-3r
+  PROJECT_ID: <your-gcp-project>
   RETRY: --retry
-  SERVICE_ACCOUNT: gjk-fat-int-3r@appspot.gserviceaccount.com
+  SERVICE_ACCOUNT: <your-gcp-project>@appspot.gserviceaccount.com
   MAX_INSTANCES: 1000
   
 
