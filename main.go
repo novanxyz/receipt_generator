@@ -264,23 +264,8 @@ func ReceiptRender(receipt *Receipt) string {
 		// if they are non-idempotent.
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	if receiptFile == nil {
-		log.Printf("target receipt file initialization fail")
-		return ""
-	}
 
-	// time consuming, send to GCS in background
 	receiptWriter := receiptFile.NewWriter(lineCtx)
-	if err != nil {
-		log.Printf("NewWriter Error: %s\n", err.Error())
-		return ""
-	}
-
-	if receiptWriter == nil {
-		log.Printf("GCS File writer not connected")
-		return ""
-	}
-
 	receipt.render(receiptWriter)
 
 	if err := receiptWriter.Close(); err != nil {
@@ -297,7 +282,7 @@ func QueueFailedUpload(receipt *Receipt) *taskspb.Task {
 	gTaskctx := context.Background()
 	client, err := cloudtasks.NewClient(gTaskctx)
 	if err != nil {
-		log.Printf("Tasks NewClient Failed: %w", err)
+		fmt.Printf("Tasks NewClient Failed: %v", err)
 		return nil
 	}
 	defer client.Close()

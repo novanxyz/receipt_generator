@@ -12,6 +12,8 @@ import (
 )
 
 var (
+	STORAGE_PREFIX_PATH = Getenv("STORAGE_PREFIX_PATH", "/tmp/")
+
 	LOCALE          = Getenv("LOCALE", "id_ID")
 	RECEIPT_PREFIX  = Getenv("RECEIPT_PREFIX", "AKAB/receipts")
 	DATE_FORMAT     = Getenv("DATE_FORMAT", "Monday, 02 January 2006")
@@ -201,9 +203,10 @@ func (this *Receipt) render(outStream io.Writer) []byte {
 	this.curLine += 16.0
 	this.printFooter()
 	this.renderCopyInfo(_t("second copy"))
-	if outStream != nil {
+	if outStream == nil {
+		this.pdf.WritePdf(fmt.Sprintf("%s/%s", STORAGE_PREFIX_PATH, this.order.getReceiptPath(this.company.Id)))
+	} else {
 		this.pdf.WriteTo(outStream)
 	}
-	// this.pdf.WritePdf(tmp_file)
 	return this.pdf.GetBytesPdf()
 }

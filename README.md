@@ -26,7 +26,7 @@ work on 2 mode, gcs trigger, or http trigger ( please look on `.gitlab-ci.yaml` 
 
 
 ### TODO
-1. rewrite the writer so it can write directly disk.
+1. rewrite the writer so it can write directly disk, it's actually does, by using `dev` in `env` ENV_VAR  
 2. internal `i/o` rate controller. For now, it controlled by how many goroutine created.
 
 reference:
