@@ -1,6 +1,6 @@
 
 
-h1. GOLANG Receipt Printer 
+# GOLANG Receipt Printer 
 
 High performance pdf receipt to Google GCS API.  
 Used to generate millions/billios of receipt in month end closing, after order are posted.  
@@ -12,7 +12,7 @@ Put to GCS, to put it as *sharing ready file system`, since the number of files 
 Moving that numbers of files are multiple time surely will take times.  
 
 
-h3. How to use,
+###. How to use
 
 check on `company.go` file for your company header ( company name, tax number, and address),   
 if can have multiple company, and selected by company ID parameter.
@@ -25,5 +25,5 @@ work on 2 mode, gcs trigger, or http trigger ( please look on `.gitlab-ci.yaml` 
 
 
 
-h3. TODO
+### TODO
 1. rewrite the writer so it can write directly
