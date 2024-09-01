@@ -2,7 +2,7 @@
 
 # GOLANG Receipt Printer 
 
-High performance pdf receipt to Google GCS API.  
+High performance pdf receipt generator to Google GCS API.  
 Used to generate millions/billios of receipt in month end closing, after order are posted.  
 ( amounts are consolidated, number of order are piled up).  
 
