@@ -1,0 +1,104 @@
+variables:
+  GCP_ZONE: asia-southeast2-a
+  GCF_NAME: tax_receipt
+  GCF_REGION: asia-southeast2
+  GCF_RUNTIME: go120
+  GCF_TIMEOUT: '500'
+  GCF_MEMORY: 2048MB
+  GCF_CPU: 2
+  FUNCTION_TARGET: ReceiptRequest
+  STAGING_BUCKET: staging.gjk-fat-int-3r.appspot.com
+  TRIGGER_BUCKET: tax_receipt_trigger
+  ASSET_FOLDER: $(pwd)
+  PROJECT_ID: gjk-fat-int-3r
+  RETRY: --retry
+  SERVICE_ACCOUNT: gjk-fat-int-3r@appspot.gserviceaccount.com
+  MAX_INSTANCES: 1000
+  
+
+
+image: google/cloud-sdk:latest
+
+stages:
+  - test
+  - deploy
+  - runtime
+
+testing:main:
+  stage: test
+  image: golang:1.20.14
+  artifacts:
+    untracked: false
+    when: on_success
+    expire_in: "7 days"
+    name: "$CI_JOB_ID"
+    paths:
+    - cache$CI_JOB_ID/*
+  cache:
+    key: build-cache
+    paths:
+    - cache$CI_JOB_ID/
+  script:
+  - export TMP_DIR=`pwd`/cache$CI_JOB_ID/
+  - mkdir $TMP_DIR
+  - export ASSET_FOLDER=`pwd`
+  - echo $GOOGLE_APPLICATION_CREDENTIALS
+  # - gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+  - go build .
+  - timeout 60 go run tests/main.go &
+  - | 
+    sleep 2 && curl  --silent -H 'Content-Type: application/json' -X PUT http://localhost:8080/$FUNCTION_TARGET?companyId=$COMPANY_ID --data-binary @$TEST_FILE
+
+
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  environment:
+    name: integration
+    url: https://console.cloud.google.com/functions/list?project=$PROJECT_ID
+  when: manual
+  script:
+    - gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+    - gcloud --project $PROJECT_ID functions deploy ${GCF_NAME}  --gen2 
+      --entry-point $FUNCTION_TARGET  --trigger-http   
+      --memory $GCF_MEMORY --timeout $GCF_TIMEOUT --cpu $GCF_CPU --max-instances $MAX_INSTANCES
+      --env-vars-file .env.yml --runtime=$GCF_RUNTIME  
+      --stage-bucket $STAGING_BUCKET --region $GCF_REGION 
+      --service-account $SERVICE_ACCOUNT
+
+deploy-gcs:
+  stage: deploy
+  only:
+    - master
+  environment:
+    name: integration
+    url: https://console.cloud.google.com/functions/list?project=$PROJECT_ID
+  when: manual
+  script:
+    - export FUNCTION_TARGET=ReceiptEvent
+    - export GCF_NAME=${GCF_NAME}_gcs
+    - sed -i 's/functions.HTTP("ReceiptRequest", ReceiptRequest)/functions.CloudEvent("ReceiptEvent", ReceiptEvent)/g' main.go
+    - gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+    - gcloud --project $PROJECT_ID functions deploy ${GCF_NAME} --entry-point $FUNCTION_TARGET --gen2
+      --trigger-event-filters="bucket=$TRIGGER_BUCKET" --trigger-event-filters="type=google.cloud.storage.object.v1.finalized"
+      --memory $GCF_MEMORY --timeout $GCF_TIMEOUT $RETRY --cpu $GCF_CPU --max-instances $MAX_INSTANCES
+      --env-vars-file .env.yml --runtime=$GCF_RUNTIME  
+      --stage-bucket $STAGING_BUCKET --region $GCF_REGION
+      --service-account $SERVICE_ACCOUNT
+
+
+generate-gcs:
+  stage: runtime
+  only:
+    - master
+  when: manual
+  tags:
+    - entbi
+  variables:
+    COMPANY_ID: ID01
+  script:
+    - cd generation
+    - echo "SERVICE_TYPE=$SERVICE_TYPE"
+    - if [[ ! -z $SERVICE_TYPE ]]; then nohup ./process.sh $SERVICE_TYPE > $SERVICE_TYPE.log &  fi
