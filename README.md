@@ -12,7 +12,7 @@ Put to GCS, to put it as *sharing ready file system`, since the number of files 
 Moving that numbers of files are multiple time surely will take times.  
 
 
-###. How to use
+### How to use
 
 check on `company.go` file for your company header ( company name, tax number, and address),   
 if can have multiple company, and selected by company ID parameter.
@@ -26,4 +26,11 @@ work on 2 mode, gcs trigger, or http trigger ( please look on `.gitlab-ci.yaml` 
 
 
 ### TODO
-1. rewrite the writer so it can write directly
+1. rewrite the writer so it can write directly disk.
+2. internal `i/o` rate controller. For now, it controlled by how many goroutine created.
+
+reference:
+* https://bytegoblin.io/blog/fundamentals-of-i-o-in-go
+* https://medium.com/@halilylm/cpu-vs-i-o-bound-benchmarking-in-go-fcd4f053694e  
+* https://www.toptal.com/back-end/server-side-io-performance-node-php-java-go  
+* https://peabody.io/post/server-env-benchmarks/
